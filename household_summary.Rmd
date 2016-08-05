@@ -6,6 +6,7 @@ Report generated `r date()`.
 library(ggplot2)
 library(dplyr)
 library(knitr)
+library(lubridate)
 
 opts_chunk$set(fig.align='center')
 
@@ -40,4 +41,34 @@ hh_country <- group_by(household, country) %>%
 ggplot(hh_country) +
     geom_bar(aes(factor(country), count, fill=country), stat='identity') +
     xlab("Country") + ylab("Number of surveys")
+```
+
+## Number of household surveys by month
+
+``` {r}
+agric <- tbl(vs_db, 'agric')
+agric_mth <- collect(agric) %>%
+    group_by(year=year(date_of_interview),
+             month=month(date_of_interview), 
+             country, landscape_no) %>%
+    summarise(count=n()) %>%
+    arrange(country, landscape_no)
+
+agric_mth$date <- with(agric_mth, as.Date(paste0(year, '/', month, '/15'), "%Y/%m/%d"))
+
+
+ggplot(agric_mth) +
+    geom_bar(aes(date, count, fill=landscape_no), stat='identity') +
+    facet_grid(country ~ .) +
+    scale_x_date(date_breaks='years', date_minor_breaks='months', date_labels='%Y') +
+    xlab("Date") + ylab("Number of surveys")
+```
+
+## Number of household surveys where date is missing
+
+``` {r}
+filter(agric_mth, is.na(year) | is.na(month)) %>%
+    group_by(country, landscape_no) %>%
+    select(-year, -month, -date) %>%
+    print(n=100)
 ```
