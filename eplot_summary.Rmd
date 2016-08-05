@@ -1,17 +1,23 @@
-# Eplot data collection by country and landscape
-
-Report generated `r date()`.
+---
+title: "Eplot data collection report"
+output:
+    html_document:
+        toc: true
+---
 
 ``` {r, echo=FALSE, results='hide'}
 library(ggplot2)
 library(dplyr)
 library(knitr)
+library(lubridate)
 
-opts_chunk$set(fig.align='center')
+opts_chunk$set(fig.align='center', echo=FALSE)
 
 vs_db <- src_postgres(dbname='vitalsigns', host='localhost', 
                       user='vitalsignsapp', password='', port=5440)
 ```
+
+Report generated `r now(tzone='UTC')` UTC.
 
 ## Number of eplots outside landscapes
 

@@ -1,6 +1,9 @@
-# Household Survey data collection by country and landscape
-
-Report generated `r date()`.
+---
+title: "Household survey data collection report"
+output:
+    html_document:
+        toc: true
+---
 
 ``` {r, echo=FALSE, results='hide'}
 library(ggplot2)
@@ -8,11 +11,13 @@ library(dplyr)
 library(knitr)
 library(lubridate)
 
-opts_chunk$set(fig.align='center')
+opts_chunk$set(fig.align='center', echo=FALSE)
 
 vs_db <- src_postgres(dbname='vitalsigns', host='localhost', 
                       user='vitalsignsapp', password='', port=5440)
 ```
+
+Report generated `r now(tzone='UTC')` UTC.
 
 ## Number of household surveys by landscape
 
@@ -43,7 +48,7 @@ ggplot(hh_country) +
     xlab("Country") + ylab("Number of surveys")
 ```
 
-## Number of household surveys by month
+## Number of household surveys by date_of_interview
 
 ``` {r}
 agric <- tbl(vs_db, 'agric')
@@ -64,11 +69,18 @@ ggplot(agric_mth) +
     xlab("Date") + ylab("Number of surveys")
 ```
 
-## Number of household surveys where date is missing
+## Number of household surveys with missing date_of_interview
 
+By landscape:
 ``` {r}
-filter(agric_mth, is.na(year) | is.na(month)) %>%
+agric_missing <- filter(agric_mth, is.na(year) | is.na(month)) %>%
     group_by(country, landscape_no) %>%
     select(-year, -month, -date) %>%
     print(n=100)
+```
+
+By country:
+``` {r}
+group_by(agric_missing, country) %>%
+    summarise(count=sum(count))
 ```
