@@ -13,7 +13,7 @@ vs_db <- src_postgres(dbname='vitalsigns', host='localhost',
                       user='vitalsignsapp', password='', port=5440)
 ```
 
-## Number of eplots by landscape (outside landscapes)
+## Number of eplots outside landscapes
 
 ``` {r, fig.align="center"}
 eplot <- tbl(vs_db, 'eplot')
