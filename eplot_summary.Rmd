@@ -1,0 +1,58 @@
+# Eplot data collection by country and landscape
+
+Report generated `r date()`.
+
+``` {r, echo=FALSE, results='hide'}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+
+opts_chunk$set(fig.align='center')
+
+vs_db <- src_postgres(dbname='vitalsigns', host='localhost', 
+                      user='vitalsignsapp', password='', port=5440)
+```
+
+## Number of eplots by landscape (outside landscapes)
+
+``` {r, fig.align="center"}
+eplot <- tbl(vs_db, 'eplot')
+eplot_inls <- group_by(eplot, country, landscape_no) %>%
+    filter(landscape_no == '000') %>%
+    summarise(n()) %>%
+    arrange(country, landscape_no) %>%
+    collect() %>%
+    print(n=50)
+ggplot(eplot_inls) +
+    geom_bar(aes(country, count, fill=country), stat='identity') +
+    xlab("Landscape") + ylab("Number of eplots")
+```
+
+## Number of eplots by landscape (within landscapes)
+
+``` {r, fig.align="center"}
+eplot <- tbl(vs_db, 'eplot')
+eplot_outls <- group_by(eplot, country, landscape_no) %>%
+    filter(landscape_no != '000') %>%
+    summarise(n()) %>%
+    arrange(country, landscape_no) %>%
+    collect() %>%
+    print(n=50)
+ggplot(eplot_outls) +
+    geom_bar(aes(factor(landscape_no), count, fill=country), stat='identity') +
+    facet_grid(country ~ .) +
+    xlab("Landscape") + ylab("Number of eplots")
+```
+
+## Number of eplots by country
+
+``` {r}
+eplot_bycountry <- group_by(eplot, country) %>%
+    summarise(n()) %>%
+    collect() %>%
+    print()
+
+ggplot(eplot_bycountry) +
+    geom_bar(aes(factor(country), count, fill=country), stat='identity') +
+    xlab("Country") + ylab("Number of eplots")
+```

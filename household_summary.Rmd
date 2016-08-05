@@ -1,0 +1,43 @@
+# Household Survey data collection by country and landscape
+
+Report generated `r date()`.
+
+``` {r, echo=FALSE, results='hide'}
+library(ggplot2)
+library(dplyr)
+library(knitr)
+
+opts_chunk$set(fig.align='center')
+
+vs_db <- src_postgres(dbname='vitalsigns', host='localhost', 
+                      user='vitalsignsapp', password='', port=5440)
+```
+
+## Number of household surveys by landscape
+
+
+``` {r, fig.align="center"}
+household <- tbl(vs_db, 'household')
+hh_ls <- group_by(household, country, landscape_no) %>% 
+    summarise(n()) %>%
+    arrange(country, landscape_no) %>%
+    collect() %>%
+    print(n=50)
+ggplot(hh_ls) +
+    geom_bar(aes(factor(landscape_no), count, fill=country), stat='identity') +
+    facet_grid(country ~ .) +
+    xlab("Landscape") + ylab("Number of surveys")
+```
+
+## Number of household surveys by country
+
+``` {r}
+hh_country <- group_by(household, country) %>% 
+    summarise(n()) %>%
+    collect() %>%
+    print()
+
+ggplot(hh_country) +
+    geom_bar(aes(factor(country), count, fill=country), stat='identity') +
+    xlab("Country") + ylab("Number of surveys")
+```
