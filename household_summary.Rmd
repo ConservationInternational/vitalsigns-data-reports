@@ -13,7 +13,7 @@ library(lubridate)
 
 opts_chunk$set(fig.align='center', echo=FALSE)
 
-pg_conf <- read.csv('rds_settings')
+pg_conf <- read.csv('rds_settings', stringsAsFactors=FALSE)
 vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       user=pg_conf$user, password=pg_conf$pass,
                       port=pg_conf$port)
