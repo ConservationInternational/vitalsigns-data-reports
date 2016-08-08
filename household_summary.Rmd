@@ -6,10 +6,10 @@ output:
 ---
 
 ``` {r, echo=FALSE, messages=FALSE, results='hide'}
-library(ggplot2)
-library(dplyr)
 library(knitr)
-library(lubridate)
+library(ggplot2)
+library(dplyr, warn.conflicts=FALSE)
+library(lubridate, warn.conflicts=FALSE)
 
 opts_chunk$set(fig.align='center', echo=FALSE)
 
