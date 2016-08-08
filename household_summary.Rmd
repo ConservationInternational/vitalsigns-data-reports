@@ -5,11 +5,11 @@ output:
         toc: true
 ---
 
-``` {r, echo=FALSE, messages=FALSE, results='hide'}
+``` {r, echo=FALSE, warning=FALSE, messages=FALSE, results='hide'}
 library(knitr)
 library(ggplot2)
-library(dplyr, warn.conflicts=FALSE)
-library(lubridate, warn.conflicts=FALSE)
+library(dplyr)
+library(lubridate)
 
 opts_chunk$set(fig.align='center', echo=FALSE)
 
