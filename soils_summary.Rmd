@@ -1,0 +1,93 @@
+---
+title: "Soils data collection Report"
+output: 
+    html_document:
+        toc: true
+---
+
+
+``` {r, echo=FALSE, warning=FALSE, messages=FALSE, results='hide'}
+library(knitr)
+library(ggplot2)
+library(plyr)
+library(dplyr, warn.conflicts=FALSE)
+library(lubridate, warn.conflicts=FALSE)
+
+opts_chunk$set(fig.align='center', echo=FALSE)
+
+pg_conf <- read.csv('rds_settings', stringsAsFactors=FALSE)
+vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
+                      user=pg_conf$user, password=pg_conf$pass,
+                      port=pg_conf$port)
+
+ffs_soils <- tbl(vs_db, 'farmfieldsoils_processed') %>% data.frame
+eplot_soils <- tbl(vs_db, 'eplotsoils_processed') %>% data.frame
+
+all_soils <- rbind.fill(ffs_soils[ , c('country', 'landscape_no', 'eplot_no', 'hh_no')],
+                        eplot_soils[ , c('country', 'landscape_no', 'eplot_no')])
+                                
+
+```
+
+Report generated `r now(tzone='UTC')` UTC.
+
+## Number soil samples by country
+
+``` {r, fig.align="center"}
+soils_cty <- group_by(all_soils, country) %>%
+    summarise(count=n()) %>%
+    print(n=50)
+ggplot(soils_cty) +
+    geom_bar(aes(country, count, fill=country), stat='identity') +
+    xlab("Country") + ylab("Number of Processed Samples")
+```
+
+## Number of soil samples by landscape
+
+``` {r, fig.align="center"}
+soils_l <- group_by(ffs_soils, country, landscape_no) %>%
+    summarise(count=n()) %>%
+    arrange(country, landscape_no) %>%
+    collect() %>%
+    print(n=50)
+ggplot(soils_l) +
+    geom_bar(aes(factor(landscape_no), count, fill=country), stat='identity') +
+    facet_grid(country ~ .) +
+    xlab("Landscape") + ylab("Number of Processed Samples")
+```
+
+## Number of farm field soil samples by country
+
+``` {r, fig.align="center"}
+soils_cty <- group_by(all_soils, country) %>%
+    summarise(count=n()) %>%
+    print(n=50)
+ggplot(soils_cty) +
+    geom_bar(aes(country, count, fill=country), stat='identity') +
+    xlab("Country") + ylab("Number of Processed Samples")
+```
+
+## Number of eplot soil samples by country
+
+``` {r, fig.align="center"}
+soils_cty <- group_by(all_soils, country) %>%
+    summarise(count=n()) %>%
+    print(n=50)
+ggplot(soils_cty) +
+    geom_bar(aes(country, count, fill=country), stat='identity') +
+    xlab("Country") + ylab("Number of Processed Samples")
+```
+
+``` {r, echo=FALSE, warning=FALSE, messages=FALSE, results='hide'}
+library(maps)
+library(mapdata)
+
+hh_coords <- tbl(vs_db, '')
+
+```
+
+## Map of soil samples in Uganda
+
+## Map of soil samples in Ghana
+
+## Map of soil samples in Tanzania
