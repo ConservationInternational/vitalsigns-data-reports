@@ -10,6 +10,7 @@ output:
 library(knitr)
 library(ggplot2)
 library(dplyr, warn.conflicts=FALSE)
+library(lubridate, warn.conflicts=FALSE)
 library(maps)
 library(mapdata)
 

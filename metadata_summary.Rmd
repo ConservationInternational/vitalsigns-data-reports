@@ -1,14 +1,14 @@
 ---
 title: "Metadata Summary"
 output:
-    html_document:
-        toc: true
+    html_document
 ---
 
 ``` {r, echo=FALSE, warning=FALSE, messages=FALSE, results='hide'}
 library(knitr)
 library(ggplot2)
 library(dplyr, warn.conflicts=FALSE)
+library(lubridate, warn.conflicts=FALSE)
 library(reshape2)
 library(DT)
 
@@ -61,6 +61,11 @@ all <- Reduce(function(x,y) merge(x, y, all=T),
 
 all[is.na(all)] <- 0
 ```
+
+##A table of entries for households in the database across all of the household protocols, for targeting duplicates and missing records
+
+Report generated `r now(tzone='UTC')` UTC.
+
 ```{r}
 DT::datatable(all, rownames = F, colnames = c("CTY", "Landscape", "Eplot", "HH", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields M", "Yields PM", "Yields W"))
 ```
