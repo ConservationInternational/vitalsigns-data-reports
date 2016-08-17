@@ -21,11 +21,26 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 ffs_soils <- tbl(vs_db, 'farmfieldsoils_processed') %>% data.frame
-eplot_soils <- tbl(vs_db, 'eplotsoils_processed') %>% data.frame
+ffs_soils$type <- 'Farm Field Soils'
 
-all_soils <- rbind.fill(ffs_soils[ , c('country', 'landscape_no', 'eplot_no', 'hh_no')],
-                        eplot_soils[ , c('country', 'landscape_no', 'eplot_no')])
-                                
+eplot_soils <- tbl(vs_db, 'eplotsoils_processed') %>% data.frame
+eplot_soils$type <- 'Eplot Soils'
+
+all_soils <- rbind(ffs_soils[ , c('country', 
+                                  'landscape_no', 
+                                  'eplot_no', 
+                                  'type')], 
+                   eplot_soils[ , c('country', 
+                                    'landscape_no', 
+                                    'eplot_no', 
+                                    'type')])
+
+library(maps)
+library(mapdata)
+
+eplot_coords <- tbl(vs_db, 'eplot') %>% data.frame
+
+with_coords <- merge(all_soils, eplot_coords, all=F) %>% unique
 
 ```
 
@@ -34,11 +49,11 @@ Report generated `r now(tzone='UTC')` UTC.
 ## Number soil samples by country
 
 ``` {r, fig.align="center"}
-soils_cty <- group_by(all_soils, country) %>%
+soils_cty <- group_by(all_soils, country, type) %>%
     summarise(count=n()) %>%
     print(n=50)
 ggplot(soils_cty) +
-    geom_bar(aes(country, count, fill=country), stat='identity') +
+    geom_bar(aes(country, count, fill=type), stat='identity') +
     xlab("Country") + ylab("Number of Processed Samples")
 ```
 
@@ -56,38 +71,38 @@ ggplot(soils_l) +
     xlab("Landscape") + ylab("Number of Processed Samples")
 ```
 
-## Number of farm field soil samples by country
-
-``` {r, fig.align="center"}
-soils_cty <- group_by(all_soils, country) %>%
-    summarise(count=n()) %>%
-    print(n=50)
-ggplot(soils_cty) +
-    geom_bar(aes(country, count, fill=country), stat='identity') +
-    xlab("Country") + ylab("Number of Processed Samples")
-```
-
-## Number of eplot soil samples by country
-
-``` {r, fig.align="center"}
-soils_cty <- group_by(all_soils, country) %>%
-    summarise(count=n()) %>%
-    print(n=50)
-ggplot(soils_cty) +
-    geom_bar(aes(country, count, fill=country), stat='identity') +
-    xlab("Country") + ylab("Number of Processed Samples")
-```
-
-``` {r, echo=FALSE, warning=FALSE, messages=FALSE, results='hide'}
-library(maps)
-library(mapdata)
-
-hh_coords <- tbl(vs_db, '')
-
-```
 
 ## Map of soil samples in Uganda
+``` {r, fig.align="center"}
+map('worldHires', 'Uganda')
+uga <- with_coords[ , c('country', "gpsse_lat", "gpsse_long")] %>% 
+  filter(country=='UGA')
+points(uga$gpsse_long, uga$gpsse_lat, col=2, pch=18)
+```
 
 ## Map of soil samples in Ghana
 
+``` {r, fig.align="center"}
+map('worldHires', 'Ghana')
+gha <- with_coords[ , c('country', "gpsse_lat", "gpsse_long")] %>% 
+  filter(country=='GHA')
+points(gha$gpsse_long, gha$gpsse_lat, col=2, pch=18)
+```
+
 ## Map of soil samples in Tanzania
+
+``` {r, fig.align="center"}
+map('worldHires', 'Tanzania')
+tza <- with_coords[ , c('country', "gpsse_lat", "gpsse_long")] %>% 
+  filter(country=='TZA')
+points(tza$gpsse_long, tza$gpsse_lat, col=2, pch=18)
+```
+
+## Map of soil samples in Rwanda
+
+``` {r, fig.align="center"}
+map('worldHires', 'Rwanda')
+rwa <- with_coords[ , c('country', "gpsse_lat", "gpsse_long")] %>% 
+  filter(country=='RWA')
+points(rwa$gpsse_long, rwa$gpsse_lat, col=2, pch=18)
+```
