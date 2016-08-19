@@ -67,5 +67,5 @@ all[is.na(all)] <- 0
 Report generated `r now(tzone='UTC')` UTC.
 
 ```{r}
-DT::datatable(all, rownames = F, colnames = c("CTY", "Landscape", "Eplot", "HH", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields M", "Yields PM", "Yields W"))
+DT::datatable(all, rownames = F, colnames = c("CTY", "Landscape", "Eplot", "HH", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields Maize", "Yields Paddy-Maize", "Yields Weight"))
 ```
