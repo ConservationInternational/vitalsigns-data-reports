@@ -4,7 +4,7 @@ output:
     html_document
 ---
 
-``` {r, echo=FALSE, warning=FALSE, messages=FALSE, results='hide'}
+``` {r, include=FALSE}
 library(knitr)
 library(ggplot2)
 library(dplyr, warn.conflicts=FALSE)
