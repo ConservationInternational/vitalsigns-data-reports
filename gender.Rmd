@@ -159,9 +159,9 @@ On which economic activity do you spend most of your time?
 hh_all$Main.Economic.Activity <- revalue(hh_all$hh_e06, c(`1`='Paid Employee', `2`='Self Employed (With Employees)', `3`='Self Employed (Without Employees)', `4`='Unpaid Family Helper (Agriculture)', `5`='Unpaid Family Helper (Non-Agriculture)', `6`='On Your Own Farm')) %>% as.character
 
 data <- hh_all %>% filter(!is.na(Main.Economic.Activity)) %>%
-  group_by(Country, Gender, Main.Economic.Activity) %>% 
+  group_by(Country, Main.Economic.Activity, Gender) %>% 
   summarize(n=n()) %>% mutate(Percent=n/sum(n)) %>% 
-  select(Country, Gender, Main.Economic.Activity, Percent) %>% 
+  select(Country, Main.Economic.Activity, Gender, Percent) %>% 
   data.frame
 
 kable(data)
