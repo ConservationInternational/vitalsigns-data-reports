@@ -1,0 +1,120 @@
+---
+title: "Eplot Locations"
+output: 
+    html_document:
+        toc: true
+---
+
+
+``` {r, include=FALSE}
+library(knitr)
+library(dplyr, warn.conflicts=FALSE)
+library(lubridate, warn.conflicts=FALSE)
+library(maps)
+library(mapdata)
+library(DT)
+
+opts_chunk$set(fig.align='center', echo=FALSE)
+
+pg_conf <- read.csv('rds_settings', stringsAsFactors=FALSE)
+vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
+                      user=pg_conf$user, password=pg_conf$pass,
+                      port=pg_conf$port)
+
+ell <- tbl(vs_db, 'eplot_lat_long') %>% data.frame()
+
+distMeters <- function(xlat, xlong, ylat, ylong){
+  #convert to meters
+  ylatm <- ylat*111128
+  xlatm <- xlat*111128
+  ylonm <- ylong*111128*cos(ylat*0.0154533)
+  xlonm <- xlong*111128*cos(xlat*0.0154533)
+  
+  d = sqrt((xlatm - ylatm)^2 + (xlonm - ylonm)^2)
+  
+  d
+}
+
+ell$dist <- mapply(FUN=distMeters, xlat=ell$proposed_lat, 
+                   xlong=ell$proposed_long, ylat=ell$official_lat,
+                   ylong=ell$official_long)
+ell$distclean[!is.na(ell$dist)] <- prettyNum(ell$dist[!is.na(ell$dist)])
+```
+
+Report generated `r now(tzone='UTC')` UTC.
+
+## Average distance (m) from assigned and official by country
+
+``` {r, fig.align="center"}
+cty_mean <- ell %>% 
+  group_by(country) %>% 
+  summarize(mean_dist = mean(dist, na.rm=T))
+
+kable(cty_mean, col.names=c('Country', 'Distance'))                                                    
+```
+
+
+## Map of eplots in Uganda
+``` {r, fig.align="center"}
+map('worldHires', 'Uganda')
+UGA <- ell[ , c('country', "proposed_lat", "proposed_long", "official_lat", "official_long")] %>% 
+  filter(country=='UGA')
+points(UGA$proposed_long, UGA$proposed_lat, col=2, pch=18)
+points(UGA$official_long, UGA$official_lat, col=3, pch=18)
+legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
+```
+
+## Map of eplots in Ghana
+
+``` {r, fig.align="center"}
+map('worldHires', 'Ghana')
+GHA <- ell[ , c('country', "proposed_lat", "proposed_long", "official_lat", "official_long")] %>% 
+  filter(country=='GHA')
+points(GHA$proposed_long, GHA$proposed_lat, col=2, pch=18)
+points(GHA$official_long, GHA$official_lat, col=3, pch=18)
+legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
+```
+
+## Map of eplots in Tanzania
+
+``` {r, fig.align="center"}
+map('worldHires', 'Tanzania')
+TZA <- ell[ , c('country', "proposed_lat", "proposed_long", "official_lat", "official_long")] %>% 
+  filter(country=='TZA')
+points(TZA$proposed_long, TZA$proposed_lat, col=2, pch=18)
+points(TZA$official_long, TZA$official_lat, col=3, pch=18)
+legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
+```
+
+## Map of eplots in Rwanda
+
+``` {r, fig.align="center"}
+map('worldHires', 'Rwanda')
+RWA <- ell[ , c('country', "proposed_lat", "proposed_long", "official_lat", "official_long")] %>% 
+  filter(country=='RWA')
+points(RWA$proposed_long, RWA$proposed_lat, col=2, pch=18)
+points(RWA$official_long, RWA$official_lat, col=3, pch=18)
+legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
+```
+
+## All Distances
+
+```{r}
+DT::datatable(ell[, c("country", 
+                      "landscape_no", 
+                      "eplot_no", 
+                      "proposed_lat", 
+                      "proposed_long", 
+                      "official_lat", 
+                      "official_long", 
+                      "disctclean")], 
+              rownames = F, 
+              colnames = c("CTY", 
+                           "Landscape", 
+                           "Eplot", 
+                           "Proposed Latitude", 
+                           "Proposed Longitude", 
+                           "Actual Latitude", 
+                           "Actual Longitude", 
+                           "Distance (m)"))
+```
