@@ -21,7 +21,13 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       user=pg_conf$user, password=pg_conf$pass,
                       port=pg_conf$port)
 
-ell <- tbl(vs_db, 'eplot_lat_long') %>% data.frame()
+eplot <- tbl(vs_db, 'eplot') %>% 
+  select(country, landscape_no, eplot_no, gpsse_lat, gpsse_long) %>%
+  data.frame()
+
+eplot_id <- tbl(vs_db, 'eplot_id') %>% data.frame()
+
+ell <- merge(eplot, eplot_id)
 
 distMeters <- function(xlat, xlong, ylat, ylong){
   #convert to meters
@@ -36,14 +42,14 @@ distMeters <- function(xlat, xlong, ylat, ylong){
 }
 
 ell$dist <- mapply(FUN=distMeters, xlat=ell$proposed_lat, 
-                   xlong=ell$proposed_long, ylat=ell$official_lat,
-                   ylong=ell$official_long)
+                   xlong=ell$proposed_long, ylat=ell$gpsse_lat,
+                   ylong=ell$gpsse_long)
 ell$distclean[!is.na(ell$dist)] <- prettyNum(ell$dist[!is.na(ell$dist)])
 ```
 
 Report generated `r now(tzone='UTC')` UTC.
 
-## Average distance (m) from assigned and official by country
+## Average distance (m) from assigned and actual by country
 
 ``` {r, fig.align="center"}
 cty_mean <- ell %>% 
@@ -57,10 +63,10 @@ kable(cty_mean, col.names=c('Country', 'Distance'))
 ## Map of eplots in Uganda
 ``` {r, fig.align="center"}
 map('worldHires', 'Uganda')
-UGA <- ell[ , c('country', "proposed_lat", "proposed_long", "official_lat", "official_long")] %>% 
+UGA <- ell[ , c('country', "proposed_lat", "proposed_long", "gpsse_lat", "gpsse_long")] %>% 
   filter(country=='UGA')
 points(UGA$proposed_long, UGA$proposed_lat, col=2, pch=18)
-points(UGA$official_long, UGA$official_lat, col=3, pch=18)
+points(UGA$gpsse_long, UGA$gpsse_lat, col=3, pch=18)
 legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
 ```
 
@@ -68,10 +74,10 @@ legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
 
 ``` {r, fig.align="center"}
 map('worldHires', 'Ghana')
-GHA <- ell[ , c('country', "proposed_lat", "proposed_long", "official_lat", "official_long")] %>% 
+GHA <- ell[ , c('country', "proposed_lat", "proposed_long", "gpsse_lat", "gpsse_long")] %>% 
   filter(country=='GHA')
 points(GHA$proposed_long, GHA$proposed_lat, col=2, pch=18)
-points(GHA$official_long, GHA$official_lat, col=3, pch=18)
+points(GHA$gpsse_long, GHA$gpsse_lat, col=3, pch=18)
 legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
 ```
 
@@ -79,10 +85,10 @@ legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
 
 ``` {r, fig.align="center"}
 map('worldHires', 'Tanzania')
-TZA <- ell[ , c('country', "proposed_lat", "proposed_long", "official_lat", "official_long")] %>% 
+TZA <- ell[ , c('country', "proposed_lat", "proposed_long", "gpsse_lat", "gpsse_long")] %>% 
   filter(country=='TZA')
 points(TZA$proposed_long, TZA$proposed_lat, col=2, pch=18)
-points(TZA$official_long, TZA$official_lat, col=3, pch=18)
+points(TZA$gpsse_long, TZA$gpsse_lat, col=3, pch=18)
 legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
 ```
 
@@ -90,10 +96,10 @@ legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
 
 ``` {r, fig.align="center"}
 map('worldHires', 'Rwanda')
-RWA <- ell[ , c('country', "proposed_lat", "proposed_long", "official_lat", "official_long")] %>% 
+RWA <- ell[ , c('country', "proposed_lat", "proposed_long", "gpsse_lat", "gpsse_long")] %>% 
   filter(country=='RWA')
 points(RWA$proposed_long, RWA$proposed_lat, col=2, pch=18)
-points(RWA$official_long, RWA$official_lat, col=3, pch=18)
+points(RWA$gpsse_long, RWA$gpsse_lat, col=3, pch=18)
 legend('bottomright', legend=c('proposed', 'actual'), col=c(2,3), pch=c(18,18))
 ```
 
@@ -105,9 +111,9 @@ DT::datatable(ell[, c("country",
                       "eplot_no", 
                       "proposed_lat", 
                       "proposed_long", 
-                      "official_lat", 
-                      "official_long", 
-                      "disctclean")], 
+                      "gpsse_lat", 
+                      "gpsse_long", 
+                      "distclean")], 
               rownames = F, 
               colnames = c("CTY", 
                            "Landscape", 
