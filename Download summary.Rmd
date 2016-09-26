@@ -1,0 +1,47 @@
+---
+title: "Downloads Report"
+output: 
+    html_document
+---
+
+
+``` {r, include=FALSE, echo=FALSE}
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(knitr)
+library(DT)
+
+pg_conf <- read.csv('rds_settings', stringsAsFactors=FALSE)
+vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
+                      user=pg_conf$user, password=pg_conf$pass,
+                      port=pg_conf$port)
+
+downloads <- tbl(vs_db, build_sql('SELECT * FROM users_schema.download')) %>%
+  filter(status=='ready') %>%
+  data.frame
+
+downloads <- downloads[!grepl('Test|test|nefarious', downloads$usage), ]
+
+downloads$date <- ymd_hms(downloads$updated_at)
+
+downloads$Year.Month <- floor_date(downloads$date, 'month')
+
+freq <- downloads %>% 
+  group_by(Year.Month) %>%
+  summarize(Downloads=n())
+
+```
+
+Report generated `r now(tzone='UTC')` UTC.    
+
+#Number of Vital Signs data downloads per month
+```{r, messages=FALSE, warnings=FALSE, echo=FALSE}
+ggplot(freq) + geom_bar(aes(substr(factor(Year.Month), 1, 7), Downloads), stat='identity')+ 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + xlab('Year and Month')
+```
+
+#Uses of Vital Signs data
+```{r, messages=FALSE, warnings=FALSE, echo=FALSE}
+downloads$usage %>% unique %>% sample %>% paste(collapse='\n\n') %>% cat
+```
