@@ -59,7 +59,7 @@ ffs_ypm <- tbl(con, 'farmfieldsoils_yields_paddy_maize') %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
         select(country, landscape_no, eplot_no, hh_no, field_id=value) %>%
         group_by(country, landscape_no, eplot_no, hh_no, field_id) %>%
-        summarise(ffs_ymp=n()) %>%
+        summarise(ffs_ypm=n()) %>%
         filter(field_id %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
         data.frame
         
@@ -86,9 +86,9 @@ all <- Reduce(function(x,y) merge(x, y, all=T),
               list(ag, ffs, ffs_l, ffs_ypm, ffs_yw, ffs_p)) %>%
           arrange(country, landscape_no, eplot_no, hh_no)
 
-all <- all[!(all$ag==1 & all$ffs==0 & all$ffs_l==0 & all$ffs_ypm==0 & all$ffs_yw==0 & all$ffs_p==0), ]
-
 all[is.na(all)] <- 0
+
+all <- all[!(all$ag==1 & all$ffs==0 & all$ffs_l==0 & all$ffs_ypm==0 & all$ffs_yw==0 & all$ffs_p==0), ]
 ```
 
 
