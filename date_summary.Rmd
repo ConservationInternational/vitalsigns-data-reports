@@ -1,0 +1,64 @@
+---
+title: "Metadata Summary"
+output:
+    html_document
+---
+
+``` {r, include=FALSE}
+library(knitr)
+library(ggplot2)
+library(dplyr, warn.conflicts=FALSE)
+library(lubridate, warn.conflicts=FALSE)
+library(reshape2)
+library(DT)
+
+opts_chunk$set(fig.align='center', echo=FALSE)
+
+pg_conf <- read.csv('rds_settings', stringsAsFactors=FALSE)
+
+vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
+                      user=pg_conf$user, password=pg_conf$pass,
+                      port=pg_conf$port)
+
+hh <- tbl(vs_db, 'household') %>%
+        select(country, landscape_no, eplot_no, hh_no, interview_date) %>% 
+        data.frame
+ag <- tbl(vs_db, 'agric') %>%
+        select(country, landscape_no, eplot_no, hh_no, date_of_interview) %>% 
+        data.frame
+hhv <- tbl(vs_db, 'household_secV') %>%
+        select(country, landscape_no, eplot_no, hh_no, end_date) %>% 
+        data.frame
+ffs <- tbl(vs_db, 'farmfieldsoils') %>%
+        select(country, landscape_no, eplot_no, hh_no, data_collection_date) %>% 
+        data.frame
+ffs_l <- tbl(vs_db, 'farmfieldsoils_lab') %>%
+        select(country, landscape_no, eplot_no, hh_no, date) %>% 
+        data.frame
+ffs_ym <- tbl(vs_db, 'farmfieldsoils_yields_maize') %>%
+        select(country, landscape_no, eplot_no, hh_no, x=data_collection_date) %>% 
+        data.frame
+ffs_ypm <- tbl(vs_db, 'farmfieldsoils_yields_paddy_maize') %>%
+        select(country, landscape_no, eplot_no, hh_no, y=data_collection_date) %>% 
+        data.frame
+ffs_yw <- tbl(vs_db, 'farmfieldsoils_yields_weight') %>%
+        select(country, landscape_no, eplot_no, hh_no, z=data_collection_date) %>% 
+        data.frame
+ffs_p <- tbl(vs_db, 'farmfieldsoils_processed') %>%
+        select(country, landscape_no, eplot_no, hh_no, sample_date) %>% 
+        data.frame
+
+#Reduce(merge, c(hh, ag, hhv, ffs, ffs_l, ffs_ym, ffs_ypm, ffs_yw), all=T)
+
+all <- Reduce(function(x,y) merge(x, y, all=T),
+              list(hh, ag, ffs, hhv, ffs_l, ffs_ym, ffs_ypm, ffs_yw, ffs_p)) %>%
+          arrange(country, landscape_no, eplot_no, hh_no)
+```
+
+##A table of entries for households in the database across all of the household protocols, for targeting duplicates and missing records
+
+Report generated `r now(tzone='UTC')` UTC.
+
+```{r}
+DT::datatable(all, rownames = F, colnames = c("CTY", "Landscape", "Eplot", "HH", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields Maize", "Yields Paddy-Maize", "Yields Weight", "Processed Soils"))
+```
