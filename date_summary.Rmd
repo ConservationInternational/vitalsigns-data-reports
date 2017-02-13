@@ -35,9 +35,6 @@ ffs <- tbl(vs_db, 'farmfieldsoils') %>%
 ffs_l <- tbl(vs_db, 'farmfieldsoils_lab') %>%
         select(country, landscape_no, eplot_no, hh_no, date) %>% 
         data.frame
-ffs_ym <- tbl(vs_db, 'farmfieldsoils_yields_maize') %>%
-        select(country, landscape_no, eplot_no, hh_no, x=data_collection_date) %>% 
-        data.frame
 ffs_ypm <- tbl(vs_db, 'farmfieldsoils_yields_paddy_maize') %>%
         select(country, landscape_no, eplot_no, hh_no, y=data_collection_date) %>% 
         data.frame
@@ -60,5 +57,5 @@ all <- Reduce(function(x,y) merge(x, y, all=T),
 Report generated `r now(tzone='UTC')` UTC.
 
 ```{r}
-DT::datatable(all, rownames = F, colnames = c("CTY", "Landscape", "Eplot", "HH", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields Maize", "Yields Paddy-Maize", "Yields Weight", "Processed Soils"))
+DT::datatable(all %>% unique, rownames = F, colnames = c("CTY", "Landscape", "Eplot", "HH", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields Paddy-Maize", "Yields Weight", "Processed Soils"))
 ```
