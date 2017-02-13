@@ -1,5 +1,5 @@
 ---
-title: "Metadata Summary"
+title: "Date Summary"
 output:
     html_document
 ---
@@ -52,7 +52,7 @@ all <- Reduce(function(x,y) merge(x, y, all=T),
           arrange(country, landscape_no, eplot_no, hh_no)
 ```
 
-##A table of entries for households in the database across all of the household protocols, for targeting duplicates and missing records
+
 
 Report generated `r now(tzone='UTC')` UTC.
 
