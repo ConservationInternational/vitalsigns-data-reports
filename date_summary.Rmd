@@ -48,7 +48,7 @@ ffs_p <- tbl(vs_db, 'farmfieldsoils_processed') %>%
 #Reduce(merge, c(hh, ag, hhv, ffs, ffs_l, ffs_ym, ffs_ypm, ffs_yw), all=T)
 
 all <- Reduce(function(x,y) merge(x, y, all=T),
-              list(hh, ag, ffs, hhv, ffs_l, ffs_ym, ffs_ypm, ffs_yw, ffs_p)) %>%
+              list(hh, ag, ffs, hhv, ffs_l, ffs_ypm, ffs_yw, ffs_p)) %>%
           arrange(country, landscape_no, eplot_no, hh_no)
 ```
 
@@ -57,5 +57,5 @@ all <- Reduce(function(x,y) merge(x, y, all=T),
 Report generated `r now(tzone='UTC')` UTC.
 
 ```{r}
-DT::datatable(all %>% unique, rownames = F, colnames = c("CTY", "Landscape", "Eplot", "HH", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields Paddy-Maize", "Yields Weight", "Processed Soils"))
+DT::datatable(all %>% unique, rownames = F, colnames = c("C", "L", "E", "HH", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields Paddy-Maize", "Yields Weight", "Processed Soils"))
 ```
