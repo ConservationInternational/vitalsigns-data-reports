@@ -38,7 +38,7 @@ ffs <- tbl(con, 'farmfieldsoils') %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
         select(country, landscape_no, eplot_no, hh_no, field_id=value) %>%
         group_by(country, landscape_no, eplot_no, hh_no, field_id) %>%
-        summarise(farmfieldsoils=n()) %>%
+        summarise(ffs=n()) %>%
         filter(field_id %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
         data.frame
 
@@ -48,7 +48,7 @@ ffs_l <- tbl(con, 'farmfieldsoils_lab') %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
         select(country, landscape_no, eplot_no, hh_no, field_id=value) %>%
         group_by(country, landscape_no, eplot_no, hh_no, field_id) %>%
-        summarise(farmfieldsoils_lab=n()) %>%
+        summarise(ffs_l=n()) %>%
         filter(field_id %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
         data.frame
 
@@ -59,7 +59,7 @@ ffs_ypm <- tbl(con, 'farmfieldsoils_yields_paddy_maize') %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
         select(country, landscape_no, eplot_no, hh_no, field_id=value) %>%
         group_by(country, landscape_no, eplot_no, hh_no, field_id) %>%
-        summarise(farmfieldsoils_ymp=n()) %>%
+        summarise(ffs_ymp=n()) %>%
         filter(field_id %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
         data.frame
         
@@ -71,22 +71,22 @@ ffs_ywc <- tbl(con, 'farmfieldsoils_yields_weight_crop') %>%
           data.frame()
 ffs_yw <- merge(ffs_yw, ffs_ywc, by.x='uuid', by.y='survey_uuid') %>%
         group_by(country, landscape_no, eplot_no, hh_no, field_id) %>% 
-        summarise(farmfieldsoils_yields_weight=n()) %>%
+        summarise(ffs_yw=n()) %>%
         data.frame
 
 ffs_p <- tbl(con, 'farmfieldsoils_processed') %>%
         select(country, landscape_no, eplot_no, hh_no, field_id=field_no) %>%
         group_by(country, landscape_no, eplot_no, hh_no, field_id) %>% 
-        summarise(farmfieldsoils_processed=n()) %>%
+        summarise(ffs_p=n()) %>%
         data.frame
 
 #Reduce(merge, c(hh, ag, hhv, ffs, ffs_l, ffs_ym, ffs_ypm, ffs_yw), all=T)
 
-agffs <- merge(ag, ffs, all.y=F, all.x=T)
-
 all <- Reduce(function(x,y) merge(x, y, all=T),
-              list(agffs, ffs_l, ffs_ypm, ffs_yw, ffs_p)) %>%
+              list(ag, ffs, ffs_l, ffs_ypm, ffs_yw, ffs_p)) %>%
           arrange(country, landscape_no, eplot_no, hh_no)
+
+all <- all[!(all$ag==1 & all$ffs==0 & all$ffs_l==0 & all$ffs_ypm==0 & all$ffs_yw==0 & all$ffs_p==0), ]
 
 all[is.na(all)] <- 0
 ```
