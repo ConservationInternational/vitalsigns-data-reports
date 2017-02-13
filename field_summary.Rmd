@@ -29,7 +29,7 @@ ag_field <- tbl(con, 'agric_field_roster') %>%
             data.frame()
 
 ag <- merge(ag, ag_field, by.x='uuid', by.y='survey_uuid') %>%
-  group_by(country, landscape_no, eplot_no, hh_no) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_id) %>%
   summarize(ag=n())
 
 
@@ -95,5 +95,5 @@ all[is.na(all)] <- 0
 Report generated `r now(tzone='UTC')` UTC.
 
 ```{r}
-DT::datatable(all, rownames = F, colnames = c("C", "L", "E", "H", "Agric", "FFS", "FFS Lab", "Yields Paddy-Maize", "Yields Weight", "Processed Soils"))
+DT::datatable(all, rownames = F, colnames = c("C", "L", "E", "H", "F", "Agric", "FFS", "FFS Lab", "Yields Paddy-Maize", "Yields Weight", "Processed Soils"))
 ```
