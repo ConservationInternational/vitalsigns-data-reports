@@ -22,22 +22,26 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 
 eplot <- tbl(vs_db, 'eplot') %>%
         group_by(country, landscape_no, eplot_no) %>% 
-        summarise(household=n()) %>%
+        summarise(eplot=n()) %>%
         data.frame
 soils <- tbl(vs_db, 'eplotsoils_sample') %>%
         group_by(country, landscape_no, eplot_no) %>% 
-        summarise(agric=n()) %>%
+        summarise(sample=n()) %>%
         data.frame
 lab <- tbl(vs_db, 'eplotsoils_lab') %>%
         group_by(country, landscape_no, eplot_no) %>% 
-        summarise(household_secV=n()) %>%
+        summarise(lab=n()) %>%
+        data.frame
+proc <- tbl(vs_db, 'eplotsoils_processed') %>%
+        group_by(country, landscape_no, eplot_no) %>% 
+        summarise(processed=n()) %>%
         data.frame
 
 
 #Reduce(merge, c(hh, ag, hhv, ffs, ffs_l, ffs_ym, ffs_ypm, ffs_yw), all=T)
 
 all <- Reduce(function(x,y) merge(x, y, all=T),
-              list(eplot, soils, lab)) %>%
+              list(eplot, soils, lab, proc)) %>%
           arrange(country, landscape_no, eplot_no)
 
 all[is.na(all)] <- 0
@@ -48,5 +52,5 @@ all[is.na(all)] <- 0
 Report generated `r now(tzone='UTC')` UTC.
 
 ```{r}
-DT::datatable(all, rownames = F, colnames = c("CTY", "Landscape", "Eplot Number", "Eplot Biomass", "Eplot Soils", "Soils Lab"))
+DT::datatable(all, rownames = F, colnames = c("CTY", "L", "E", "Eplot Biomass", "Eplot Soils", "Soils Lab", "Processed"))
 ```
