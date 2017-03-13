@@ -21,19 +21,19 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 eplot <- tbl(vs_db, 'eplot') %>%
-        group_by(country, landscape_no, eplot_no) %>% 
+        group_by(country, landscape_no, eplot_no, round) %>% 
         summarise(eplot=n()) %>%
         data.frame
 soils <- tbl(vs_db, 'eplotsoils_sample') %>%
-        group_by(country, landscape_no, eplot_no) %>% 
+        group_by(country, landscape_no, eplot_no, round) %>% 
         summarise(sample=n()) %>%
         data.frame
 lab <- tbl(vs_db, 'eplotsoils_lab') %>%
-        group_by(country, landscape_no, eplot_no) %>% 
+        group_by(country, landscape_no, eplot_no, round) %>% 
         summarise(lab=n()) %>%
         data.frame
 proc <- tbl(vs_db, 'eplotsoils_processed') %>%
-        group_by(country, landscape_no, eplot_no) %>% 
+        group_by(country, landscape_no, eplot_no, round) %>% 
         summarise(processed=n()) %>%
         data.frame
 
@@ -42,7 +42,7 @@ proc <- tbl(vs_db, 'eplotsoils_processed') %>%
 
 all <- Reduce(function(x,y) merge(x, y, all=T),
               list(eplot, soils, lab, proc)) %>%
-          arrange(country, landscape_no, eplot_no)
+          arrange(country, landscape_no, eplot_no, round)
 
 all[is.na(all)] <- 0
 ```
@@ -52,5 +52,5 @@ all[is.na(all)] <- 0
 Report generated `r now(tzone='UTC')` UTC.
 
 ```{r}
-DT::datatable(all, rownames = F, colnames = c("CTY", "L", "E", "Eplot Biomass", "Eplot Soils", "Soils Lab", "Processed"))
+DT::datatable(all, rownames = F, colnames = c("CTY", "L", "E", "R", Eplot Biomass", "Eplot Soils", "Soils Lab", "Processed"))
 ```
