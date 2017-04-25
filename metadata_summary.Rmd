@@ -40,13 +40,13 @@ ffs_l <- tbl(vs_db, 'farmfieldsoils_lab') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(farmfieldsoils_lab=n()) %>%
         data.frame
-ffs_ypm <- tbl(vs_db, 'farmfieldsoils_yields_paddy_maize') %>%
+y_hh <- tbl(vs_db, 'yields_hh') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
-        summarise(farmfieldsoils_yields_paddy_maize=n()) %>%
+        summarise(yields_hh=n()) %>%
         data.frame
-ffs_yw <- tbl(vs_db, 'farmfieldsoils_yields_weight') %>%
+y_l <- tbl(vs_db, 'yieldslab_hh') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
-        summarise(farmfieldsoils_yields_weight=n()) %>%
+        summarise(yieldslab_hh=n()) %>%
         data.frame
 ffs_p <- tbl(vs_db, 'farmfieldsoils_processed') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
@@ -56,7 +56,7 @@ ffs_p <- tbl(vs_db, 'farmfieldsoils_processed') %>%
 #Reduce(merge, c(hh, ag, hhv, ffs, ffs_l, ffs_ym, ffs_ypm, ffs_yw), all=T)
 
 all <- Reduce(function(x,y) merge(x, y, all=T),
-              list(hh, ag, ffs, hhv, ffs_l, ffs_ypm, ffs_yw, ffs_p)) %>%
+              list(hh, ag, ffs, hhv, ffs_l, y_hh, y_l, ffs_p)) %>%
           arrange(country, landscape_no, eplot_no, hh_no, round)
 
 all[is.na(all)] <- 0
@@ -67,5 +67,5 @@ all[is.na(all)] <- 0
 Report generated `r now(tzone='UTC')` UTC.
 
 ```{r}
-DT::datatable(all, rownames = F, colnames = c("C", "L", "E", "H", "R", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields Paddy-Maize", "Yields Weight", "Processed Soils"))
+DT::datatable(all, rownames = F, colnames = c("C", "L", "E", "H", "R", "Household", "Agric", "FFS", "SecV", "FFS Lab", "Yields", "Yields Lab", "Processed Soils"))
 ```

@@ -53,7 +53,7 @@ ffs_l <- tbl(con, 'farmfieldsoils_lab') %>%
         data.frame
 
 
-ffs_ypm <- tbl(con, 'farmfieldsoils_yields_paddy_maize') %>%
+ffs_ypm <- tbl(con, 'yields_hh') %>%
         select(country, landscape_no, eplot_no, hh_no, selected_first_field, selected_second_field) %>%
         data.frame %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
@@ -63,10 +63,10 @@ ffs_ypm <- tbl(con, 'farmfieldsoils_yields_paddy_maize') %>%
         filter(field_id %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
         data.frame
         
-ffs_yw <- tbl(con, 'farmfieldsoils_yields_weight') %>%
+ffs_yw <- tbl(con, 'yieldslab_hh') %>%
           select(uuid, country, landscape_no, eplot_no, hh_no) %>% 
           data.frame()
-ffs_ywc <- tbl(con, 'farmfieldsoils_yields_weight_crop') %>%
+ffs_ywc <- tbl(con, 'yieldslab_field') %>%
           select(survey_uuid, field_id=field_no) %>%
           data.frame()
 ffs_yw <- merge(ffs_yw, ffs_ywc, by.x='uuid', by.y='survey_uuid') %>%
@@ -95,5 +95,5 @@ all <- all[!(all$ag==1 & all$ffs==0 & all$ffs_l==0 & all$ffs_ypm==0 & all$ffs_yw
 Report generated `r now(tzone='UTC')` UTC.
 
 ```{r}
-DT::datatable(all, rownames = F, colnames = c("C", "L", "E", "H", "F", "Agric", "FFS", "FFS Lab", "Yields Paddy-Maize", "Yields Weight", "Processed Soils"))
+DT::datatable(all, rownames = F, colnames = c("C", "L", "E", "H", "F", "Agric", "FFS", "FFS Lab", "Yields", "Yields Lab", "Processed Soils"))
 ```
