@@ -24,59 +24,59 @@ ag <- tbl(con, 'agric') %>%
         select(uuid, country, landscape_no, eplot_no, hh_no) %>%
         data.frame
 
-ag_field <- tbl(con, 'agric_field_roster') %>%
-            select(survey_uuid, field_id) %>%
+ag_field <- tbl(con, 'agric_field') %>%
+            select(survey_uuid, field_no) %>%
             data.frame()
 
 ag <- merge(ag, ag_field, by.x='uuid', by.y='survey_uuid') %>%
-  group_by(country, landscape_no, eplot_no, hh_no, field_id) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
   summarize(ag=n())
 
 
-ffs <- tbl(con, 'farmfieldsoils') %>%
-        select(country, landscape_no, eplot_no, hh_no, selected_first_field, selected_second_field, selected_first_field_other, selected_second_field_other) %>% data.frame %>%
+ffs <- tbl(con, 'farmsoils') %>%
+        select(country, landscape_no, eplot_no, hh_no, farm_selected_first_field, farm_selected_second_field, farm_selected_first_field_other, farm_selected_second_field_other) %>% data.frame %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
-        select(country, landscape_no, eplot_no, hh_no, field_id=value) %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_id) %>%
+        select(country, landscape_no, eplot_no, hh_no, field_no=value) %>%
+        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
         summarise(ffs=n()) %>%
-        filter(field_id %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
+        filter(field_no %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
         data.frame
 
-ffs_l <- tbl(con, 'farmfieldsoils_lab') %>%
-        select(country, landscape_no, eplot_no, hh_no, selected_first_field, selected_second_field) %>%
+ffs_l <- tbl(con, 'farmsoilslab') %>%
+        select(country, landscape_no, eplot_no, hh_no, farmlab_selected_first_field, farmlab_selected_second_field) %>%
         data.frame %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
-        select(country, landscape_no, eplot_no, hh_no, field_id=value) %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_id) %>%
+        select(country, landscape_no, eplot_no, hh_no, field_no=value) %>%
+        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
         summarise(ffs_l=n()) %>%
-        filter(field_id %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
+        filter(field_no %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
         data.frame
 
 
-ffs_ypm <- tbl(con, 'yields_hh') %>%
-        select(country, landscape_no, eplot_no, hh_no, selected_first_field, selected_second_field) %>%
+ffs_ypm <- tbl(con, 'yields') %>%
+        select(country, landscape_no, eplot_no, hh_no, yield_selected_first_field, yield_selected_second_field) %>%
         data.frame %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
-        select(country, landscape_no, eplot_no, hh_no, field_id=value) %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_id) %>%
+        select(country, landscape_no, eplot_no, hh_no, field_no=value) %>%
+        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
         summarise(ffs_ypm=n()) %>%
-        filter(field_id %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
+        filter(field_no %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
         data.frame
         
-ffs_yw <- tbl(con, 'yieldslab_hh') %>%
+ffs_yw <- tbl(con, 'yieldslab') %>%
           select(uuid, country, landscape_no, eplot_no, hh_no) %>% 
           data.frame()
 ffs_ywc <- tbl(con, 'yieldslab_field') %>%
-          select(survey_uuid, field_id=field_no) %>%
+          select(survey_uuid, field_no) %>%
           data.frame()
 ffs_yw <- merge(ffs_yw, ffs_ywc, by.x='uuid', by.y='survey_uuid') %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_id) %>% 
+        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>% 
         summarise(ffs_yw=n()) %>%
         data.frame
 
-ffs_p <- tbl(con, 'farmfieldsoils_processed') %>%
-        select(country, landscape_no, eplot_no, hh_no, field_id=field_no) %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_id) %>% 
+ffs_p <- tbl(con, 'processedsoils_farm') %>%
+        select(country, landscape_no, eplot_no, hh_no, field_no=field_no) %>%
+        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>% 
         summarise(ffs_p=n()) %>%
         data.frame
 

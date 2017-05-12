@@ -21,10 +21,10 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       user=pg_conf$user, password=pg_conf$pass,
                       port=pg_conf$port)
 
-ffs_soils <- tbl(vs_db, 'farmfieldsoils_processed') %>% data.frame
+ffs_soils <- tbl(vs_db, 'processedsoils_farm') %>% data.frame
 ffs_soils$type <- 'Farm Field Soils'
 
-eplot_soils <- tbl(vs_db, 'eplotsoils_processed') %>% data.frame
+eplot_soils <- tbl(vs_db, 'processedsoils_eplot') %>% data.frame
 eplot_soils$type <- 'Eplot Soils'
 
 all_soils <- rbind(ffs_soils[ , c('country', 

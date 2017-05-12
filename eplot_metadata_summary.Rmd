@@ -22,19 +22,19 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 
 eplot <- tbl(vs_db, 'eplot') %>%
         group_by(country, landscape_no, eplot_no, round) %>% 
-        summarise(eplot=n()) %>%
+        dplyr::summarise(eplot=n()) %>%
         data.frame
-soils <- tbl(vs_db, 'eplotsoils_sample') %>%
+soils <- tbl(vs_db, 'eplotsoils') %>%
         group_by(country, landscape_no, eplot_no, round) %>% 
-        summarise(sample=n()) %>%
+        dplyr::summarise(sample=n()) %>%
         data.frame
-lab <- tbl(vs_db, 'eplotsoils_lab') %>%
+lab <- tbl(vs_db, 'eplotsoilslab') %>%
         group_by(country, landscape_no, eplot_no, round) %>% 
-        summarise(lab=n()) %>%
+        dplyr::summarise(lab=n()) %>%
         data.frame
-proc <- tbl(vs_db, 'eplotsoils_processed') %>%
+proc <- tbl(vs_db, 'processedsoils_eplot') %>%
         group_by(country, landscape_no, eplot_no, round) %>% 
-        summarise(processed=n()) %>%
+        dplyr::summarise(processed=n()) %>%
         data.frame
 
 

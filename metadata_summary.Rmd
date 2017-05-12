@@ -28,27 +28,27 @@ ag <- tbl(vs_db, 'agric') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(agric=n()) %>%
         data.frame
-hhv <- tbl(vs_db, 'household_secV') %>%
+hhv <- tbl(vs_db, 'household_pii') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(household_secV=n()) %>%
         data.frame
-ffs <- tbl(vs_db, 'farmfieldsoils') %>%
+ffs <- tbl(vs_db, 'farmsoils') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(farmfieldsoils=n()) %>%
         data.frame
-ffs_l <- tbl(vs_db, 'farmfieldsoils_lab') %>%
+ffs_l <- tbl(vs_db, 'farmsoilslab') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(farmfieldsoils_lab=n()) %>%
         data.frame
-y_hh <- tbl(vs_db, 'yields_hh') %>%
+y_hh <- tbl(vs_db, 'yields') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(yields_hh=n()) %>%
         data.frame
-y_l <- tbl(vs_db, 'yieldslab_hh') %>%
+y_l <- tbl(vs_db, 'yields') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(yieldslab_hh=n()) %>%
         data.frame
-ffs_p <- tbl(vs_db, 'farmfieldsoils_processed') %>%
+ffs_p <- tbl(vs_db, 'processedsoils_farm') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(farmfieldsoils_processed=n()) %>%
         data.frame

@@ -55,8 +55,8 @@ ggplot(hh_country) +
 ``` {r}
 agric <- tbl(vs_db, 'agric')
 agric_mth <- collect(agric) %>%
-    group_by(year=year(date_of_interview),
-             month=month(date_of_interview), 
+    group_by(year=year(ag_date_of_interview),
+             month=month(ag_date_of_interview), 
              country, landscape_no) %>%
     summarise(count=n()) %>%
     arrange(country, landscape_no)
