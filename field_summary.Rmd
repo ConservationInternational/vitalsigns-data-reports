@@ -21,6 +21,7 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 ag <- tbl(con, 'agric') %>%
+      inner_join(tbl(con, 'piigeo_agric')) %>%
         select(uuid, country, landscape_no, eplot_no, hh_no) %>%
         data.frame
 
@@ -34,6 +35,7 @@ ag <- merge(ag, ag_field, by.x='uuid', by.y='survey_uuid') %>%
 
 
 ffs <- tbl(con, 'farmsoils') %>%
+      inner_join(tbl(con, 'piigeo_farmsoils')) %>%
         select(country, landscape_no, eplot_no, hh_no, farm_selected_first_field, farm_selected_second_field, farm_selected_first_field_other, farm_selected_second_field_other) %>% data.frame %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
         select(country, landscape_no, eplot_no, hh_no, field_no=value) %>%
@@ -43,6 +45,7 @@ ffs <- tbl(con, 'farmsoils') %>%
         data.frame
 
 ffs_l <- tbl(con, 'farmsoilslab') %>%
+      inner_join(tbl(con, 'piigeo_farmsoilslab')) %>%
         select(country, landscape_no, eplot_no, hh_no, farmlab_selected_first_field, farmlab_selected_second_field) %>%
         data.frame %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
@@ -54,6 +57,7 @@ ffs_l <- tbl(con, 'farmsoilslab') %>%
 
 
 ffs_ypm <- tbl(con, 'yields') %>%
+      inner_join(tbl(con, 'piigeo_yields')) %>%
         select(country, landscape_no, eplot_no, hh_no, yield_selected_first_field, yield_selected_second_field) %>%
         data.frame %>%
         melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
@@ -64,6 +68,7 @@ ffs_ypm <- tbl(con, 'yields') %>%
         data.frame
         
 ffs_yw <- tbl(con, 'yieldslab') %>%
+      inner_join(tbl(con, 'piigeo_yieldslab')) %>%
           select(uuid, country, landscape_no, eplot_no, hh_no) %>% 
           data.frame()
 ffs_ywc <- tbl(con, 'yieldslab_field') %>%
@@ -75,6 +80,7 @@ ffs_yw <- merge(ffs_yw, ffs_ywc, by.x='uuid', by.y='survey_uuid') %>%
         data.frame
 
 ffs_p <- tbl(con, 'processedsoils_farm') %>%
+      inner_join(tbl(con, 'piigeo_processedsoils_farm')) %>%
         select(country, landscape_no, eplot_no, hh_no, field_no=field_no) %>%
         group_by(country, landscape_no, eplot_no, hh_no, field_no) %>% 
         summarise(ffs_p=n()) %>%

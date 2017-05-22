@@ -21,27 +21,34 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 hh <- tbl(vs_db, 'household') %>%
+        inner_join(tbl(vs_db, 'piigeo_household')) %>%
         select(country, landscape_no, eplot_no, hh_no, round, hh_interview_date) %>% 
         data.frame
 ag <- tbl(vs_db, 'agric') %>%
+        inner_join(tbl(vs_db, 'piigeo_agric')) %>%
         select(country, landscape_no, eplot_no, hh_no, round, ag_date_of_interview) %>% 
         data.frame
-hhv <- tbl(vs_db, 'household_pii') %>%
+hhv <- tbl(vs_db, 'householdcontact') %>%
         select(country, landscape_no, eplot_no, hh_no, round, end_date) %>% 
         data.frame
 ffs <- tbl(vs_db, 'farmsoils') %>%
+        inner_join(tbl(vs_db, 'piigeo_farmsoils')) %>%
         select(country, landscape_no, eplot_no, hh_no, round, farm_data_collection_date) %>% 
         data.frame
 ffs_l <- tbl(vs_db, 'farmsoilslab') %>%
+        inner_join(tbl(vs_db, 'piigeo_farmsoilslab')) %>%
         select(country, landscape_no, eplot_no, hh_no, round, farmlab_date) %>% 
         data.frame
 ffs_ypm <- tbl(vs_db, 'yields') %>%
+        inner_join(tbl(vs_db, 'piigeo_yields')) %>%
         select(country, landscape_no, eplot_no, hh_no, round, y=yield_data_collection_date) %>% 
         data.frame
 ffs_yw <- tbl(vs_db, 'yieldslab') %>%
+        inner_join(tbl(vs_db, 'piigeo_yieldslab')) %>%
         select(country, landscape_no, eplot_no, hh_no, round, z=yieldlab_data_collection_date) %>% 
         data.frame
 ffs_p <- tbl(vs_db, 'processedsoils_farm') %>%
+        inner_join(tbl(vs_db, 'piigeo_processedsoils_farm')) %>%
         select(country, landscape_no, eplot_no, hh_no, round, farmproc_sample_date) %>% 
         data.frame
 

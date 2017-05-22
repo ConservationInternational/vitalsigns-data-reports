@@ -21,34 +21,41 @@ vs_db <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 hh <- tbl(vs_db, 'household') %>%
+        inner_join(tbl(vs_db, 'piigeo_household')) %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(household=n()) %>%
         data.frame
 ag <- tbl(vs_db, 'agric') %>%
+        inner_join(tbl(vs_db, 'piigeo_agric')) %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(agric=n()) %>%
         data.frame
-hhv <- tbl(vs_db, 'household_pii') %>%
+hhv <- tbl(vs_db, 'householdcontact') %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(household_secV=n()) %>%
         data.frame
 ffs <- tbl(vs_db, 'farmsoils') %>%
+        inner_join(tbl(vs_db, 'piigeo_farmsoils')) %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(farmfieldsoils=n()) %>%
         data.frame
 ffs_l <- tbl(vs_db, 'farmsoilslab') %>%
+        inner_join(tbl(vs_db, 'piigeo_farmsoilslab')) %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(farmfieldsoils_lab=n()) %>%
         data.frame
 y_hh <- tbl(vs_db, 'yields') %>%
+        inner_join(tbl(vs_db, 'piigeo_yields')) %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(yields_hh=n()) %>%
         data.frame
-y_l <- tbl(vs_db, 'yields') %>%
+y_l <- tbl(vs_db, 'yieldslab') %>%
+        inner_join(tbl(vs_db, 'piigeo_yieldslab')) %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(yieldslab_hh=n()) %>%
         data.frame
 ffs_p <- tbl(vs_db, 'processedsoils_farm') %>%
+        inner_join(tbl(vs_db, 'piigeo_processedsoils_farm')) %>%
         group_by(country, landscape_no, eplot_no, hh_no, round) %>% 
         summarise(farmfieldsoils_processed=n()) %>%
         data.frame
