@@ -21,75 +21,49 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
                       port=pg_conf$port)
 
 ag <- tbl(con, 'agric') %>%
-      inner_join(tbl(con, 'piigeo_agric')) %>%
-        select(uuid, country, landscape_no, eplot_no, hh_no) %>%
-        data.frame
-
-ag_field <- tbl(con, 'agric_field') %>%
-            select(survey_uuid, field_no) %>%
-            data.frame()
-
-ag <- merge(ag, ag_field, by.x='uuid', by.y='survey_uuid') %>%
+  inner_join(tbl(con, 'piigeo_agric')) %>%
+  inner_join(tbl(con, 'agric_field'), by=c('uuid'='parent_uuid')) %>%
   group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
   summarize(ag=n())
 
 
-ffs <- tbl(con, 'farmsoils') %>%
-      inner_join(tbl(con, 'piigeo_farmsoils')) %>%
-        select(country, landscape_no, eplot_no, hh_no, farm_selected_first_field, farm_selected_second_field, farm_selected_first_field_other, farm_selected_second_field_other) %>% data.frame %>%
-        melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
-        select(country, landscape_no, eplot_no, hh_no, field_no=value) %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
-        summarise(ffs=n()) %>%
-        filter(field_no %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
-        data.frame
+fs <- tbl(con, 'farmsoils') %>%
+  inner_join(tbl(con, 'piigeo_farmsoils')) %>%
+  inner_join(tbl(con, 'farmsoils_field'), by=c('uuid'='parent_uuid')) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
+  summarise(fs=n()) %>%
+  data.frame
 
-ffs_l <- tbl(con, 'farmsoilslab') %>%
-      inner_join(tbl(con, 'piigeo_farmsoilslab')) %>%
-        select(country, landscape_no, eplot_no, hh_no, farmlab_selected_first_field, farmlab_selected_second_field) %>%
-        data.frame %>%
-        melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
-        select(country, landscape_no, eplot_no, hh_no, field_no=value) %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
-        summarise(ffs_l=n()) %>%
-        filter(field_no %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
-        data.frame
+fsl <- tbl(con, 'farmsoilslab') %>%
+  inner_join(tbl(con, 'piigeo_farmsoilslab')) %>%
+  inner_join(tbl(con, 'farmsoilslab_field'), by=c('uuid'='parent_uuid')) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
+  summarise(ffsl=n()) %>%
+  data.frame
 
-
-ffs_ypm <- tbl(con, 'yields') %>%
-      inner_join(tbl(con, 'piigeo_yields')) %>%
-        select(country, landscape_no, eplot_no, hh_no, yield_selected_first_field, yield_selected_second_field) %>%
-        data.frame %>%
-        melt(id.vars=c('country', 'landscape_no', 'eplot_no', 'hh_no')) %>%
-        select(country, landscape_no, eplot_no, hh_no, field_no=value) %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
-        summarise(ffs_ypm=n()) %>%
-        filter(field_no %in% c('M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7', 'M8')) %>%
-        data.frame
+y <- tbl(con, 'yields') %>%
+  inner_join(tbl(con, 'piigeo_yields')) %>%
+  inner_join(tbl(con, 'yields_field'), by=c('uuid'='parent_uuid')) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
+  summarise(y=n()) %>%
+  data.frame
         
-ffs_yw <- tbl(con, 'yieldslab') %>%
-      inner_join(tbl(con, 'piigeo_yieldslab')) %>%
-          select(uuid, country, landscape_no, eplot_no, hh_no) %>% 
-          data.frame()
-ffs_ywc <- tbl(con, 'yieldslab_field') %>%
-          select(survey_uuid, field_no) %>%
-          data.frame()
-ffs_yw <- merge(ffs_yw, ffs_ywc, by.x='uuid', by.y='survey_uuid') %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>% 
-        summarise(ffs_yw=n()) %>%
-        data.frame
+yl <- tbl(con, 'yieldslab') %>%
+  inner_join(tbl(con, 'piigeo_yieldslab')) %>%
+  inner_join(tbl(con, 'yieldslab_field'), by=c('uuid'='parent_uuid')) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>% 
+  summarise(yl=n()) %>%
+  data.frame
 
-ffs_p <- tbl(con, 'processedsoils_farm') %>%
-      inner_join(tbl(con, 'piigeo_processedsoils_farm')) %>%
-        select(country, landscape_no, eplot_no, hh_no, field_no=field_no) %>%
-        group_by(country, landscape_no, eplot_no, hh_no, field_no) %>% 
-        summarise(ffs_p=n()) %>%
-        data.frame
+ps <- tbl(con, 'processedsoils_farm') %>%
+  inner_join(tbl(con, 'piigeo_processedsoils_farm')) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>% 
+  summarise(ffs_p=n()) %>%
+  data.frame
 
-#Reduce(merge, c(hh, ag, hhv, ffs, ffs_l, ffs_ym, ffs_ypm, ffs_yw), all=T)
 
 all <- Reduce(function(x,y) merge(x, y, all=T),
-              list(ag, ffs, ffs_l, ffs_ypm, ffs_yw, ffs_p)) %>%
+              list(ag, fs, fsl, y, yl, ps)) %>%
           arrange(country, landscape_no, eplot_no, hh_no)
 
 all[is.na(all)] <- 0
