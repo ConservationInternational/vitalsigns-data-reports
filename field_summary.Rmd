@@ -23,57 +23,55 @@ con <- src_postgres(dbname='vitalsigns', host=pg_conf$host,
 ag <- tbl(con, 'agric') %>%
   inner_join(tbl(con, 'piigeo_agric')) %>%
   inner_join(tbl(con, 'agric_field'), by=c('uuid'='parent_uuid')) %>%
-  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no, round) %>%
   summarize(ag=n())
 
 
 fs <- tbl(con, 'farmsoils') %>%
   inner_join(tbl(con, 'piigeo_farmsoils')) %>%
   inner_join(tbl(con, 'farmsoils_field'), by=c('uuid'='parent_uuid')) %>%
-  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no, round) %>%
   summarise(fs=n()) %>%
   data.frame
 
 fsl <- tbl(con, 'farmsoilslab') %>%
   inner_join(tbl(con, 'piigeo_farmsoilslab')) %>%
   inner_join(tbl(con, 'farmsoilslab_field'), by=c('uuid'='parent_uuid')) %>%
-  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no, round) %>%
   summarise(ffsl=n()) %>%
   data.frame
 
 y <- tbl(con, 'yields') %>%
   inner_join(tbl(con, 'piigeo_yields')) %>%
   inner_join(tbl(con, 'yields_field'), by=c('uuid'='parent_uuid')) %>%
-  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>%
+  group_by(country, landscape_no, eplot_no, hh_no, field_no, round) %>%
   summarise(y=n()) %>%
   data.frame
         
 yl <- tbl(con, 'yieldslab') %>%
   inner_join(tbl(con, 'piigeo_yieldslab')) %>%
   inner_join(tbl(con, 'yieldslab_field'), by=c('uuid'='parent_uuid')) %>%
-  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>% 
+  group_by(country, landscape_no, eplot_no, hh_no, field_no, round) %>% 
   summarise(yl=n()) %>%
   data.frame
 
 ps <- tbl(con, 'processedsoils_farm') %>%
   inner_join(tbl(con, 'piigeo_processedsoils_farm')) %>%
-  group_by(country, landscape_no, eplot_no, hh_no, field_no) %>% 
+  group_by(country, landscape_no, eplot_no, hh_no, field_no, round) %>% 
   summarise(ffs_p=n()) %>%
   data.frame
 
 
 all <- Reduce(function(x,y) merge(x, y, all=T),
               list(ag, fs, fsl, y, yl, ps)) %>%
-          arrange(country, landscape_no, eplot_no, hh_no)
+          arrange(country, landscape_no, eplot_no, hh_no, round)
 
 all[is.na(all)] <- 0
-
-all <- all[!(all$ag==1 & all$ffs==0 & all$ffs_l==0 & all$ffs_ypm==0 & all$ffs_yw==0 & all$ffs_p==0), ]
 ```
 
 
 Report generated `r now(tzone='UTC')` UTC.
 
 ```{r}
-DT::datatable(all, rownames = F, colnames = c("C", "L", "E", "H", "F", "Agric", "FFS", "FFS Lab", "Yields", "Yields Lab", "Processed Soils"))
+DT::datatable(all, rownames = F, colnames = c("C", "L", "E", "H", "R", "F", "Agric", "FS", "FS Lab", "Yields", "Yields Lab", "Processed Soils"))
 ```
